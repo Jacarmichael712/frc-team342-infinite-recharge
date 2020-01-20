@@ -49,6 +49,8 @@ public class ControlPanelSystem extends SubsystemBase {
     moveElevator.configAllowableClosedloopError(0, 0, 1);
 
     // setting PID slots and feedback sensor
+    spinMotor.selectProfileSlot(0, 0);
+    moveElevator.selectProfileSlot(0, 0);
     spinMotor.configSelectedFeedbackSensor(FeedbackDevice.PulseWidthEncodedPosition);
     moveElevator.configSelectedFeedbackSensor(FeedbackDevice.PulseWidthEncodedPosition);
 
