@@ -7,24 +7,24 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Factory;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveSystem;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.ClimbSubsystem;
 
-public class DriveWithPercent extends CommandBase {
-  private final DriveSystem driveSystem;
-  private final Joystick joy;
-  private double Y;
-
+public class ActivateWinches extends CommandBase {
   /**
-   * Creates a new DriveWithPercent.
+   * Creates a new ActivateWinchs.
    */
-  public DriveWithPercent() {
-    driveSystem = Factory.getDrive();
-    joy = RobotContainer.getJoy();
+  private final ClimbSubsystem cs;
+
+  public ActivateWinches() {
     // Use addRequirements() here to declare subsystem dependencies.
+    cs = Factory.getClimb();
   }
 
   // Called when the command is initially scheduled.
@@ -35,16 +35,16 @@ public class DriveWithPercent extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Y = joy.getY();
-    driveSystem.PercentOut(Y);
+    cs.spinWinchMotors(0.6);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    cs.spinWinchMotors(0.0);
   }
 
-  // Returns true when the command should end.
+  // Returns true when the command should end
   @Override
   public boolean isFinished() {
     return false;
