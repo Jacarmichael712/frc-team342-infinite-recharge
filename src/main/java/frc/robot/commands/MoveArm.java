@@ -7,24 +7,20 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Factory;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveSystem;
+import frc.robot.subsystems.ControlPanelSubsystem;
 
-public class DriveWithPercent extends CommandBase {
-  private final DriveSystem driveSystem;
-  private final Joystick joy;
-  private double Y;
-
+public class MoveArm extends CommandBase {
   /**
-   * Creates a new DriveWithPercent.
+   * Creates a new MoveArm.
    */
-  public DriveWithPercent() {
-    driveSystem = Factory.getDrive();
-    joy = RobotContainer.getJoy();
+
+  private ControlPanelSubsystem cps;
+
+  public MoveArm() {
     // Use addRequirements() here to declare subsystem dependencies.
+    cps = Factory.getControl();
   }
 
   // Called when the command is initially scheduled.
@@ -35,13 +31,14 @@ public class DriveWithPercent extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Y = joy.getY();
-    driveSystem.PercentOut(Y);
+    System.out.println("Bruh Moment");
+    cps.moveArm();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    cps.setArmBoolean();
   }
 
   // Returns true when the command should end.
