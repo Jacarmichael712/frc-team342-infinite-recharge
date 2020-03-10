@@ -10,15 +10,18 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
+
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+
 import frc.robot.commands.DriveWithJoystick;
 
 public class DriveSystem extends SubsystemBase {
+
 
   private CANSparkMax motorRight1;
   private CANSparkMax motorRight2;
@@ -37,7 +40,6 @@ public class DriveSystem extends SubsystemBase {
   private boolean isSlowMode = false;
   private boolean isTurbo = false;
   private boolean isTargeting = false;
-
   private static final double ramp_rate = 0.2;
   private static final double voltage_comp = 12.0;
   private static final int current_limit = 60;
@@ -95,6 +97,12 @@ public class DriveSystem extends SubsystemBase {
 
     motorLeft1.getEncoder().setPosition(0);
 
+    encoderL1 = new CANEncoder(motorLeft1);
+    encoderL2 = new CANEncoder(motorLeft2);
+    encoderR1 = new CANEncoder(motorRight1);
+    encoderR2 = new CANEncoder(motorRight2); 
+
+
     mecanumDrive = new MecanumDrive(motorLeft1, motorLeft2, motorRight1, motorRight2);
 
     NavX = new AHRS();
@@ -110,11 +118,15 @@ public class DriveSystem extends SubsystemBase {
         mecanumDrive.driveCartesian(xSpeed, ySpeed, zRotation, -NavX.getAngle());
       else
         mecanumDrive.driveCartesian(xSpeed, ySpeed, (zRotation) / 2, -NavX.getAngle());
-    } else if (isSlowMode == true)
-      mecanumDrive.driveCartesian((xSpeed * 0.8) / 2, (ySpeed * 0.8) / 2, (zRotation * 0.8) / 4);
-    else if (isTurbo == true)
-      mecanumDrive.driveCartesian(xSpeed, ySpeed, zRotation);
-    else {
+
+    } else if (isPID == true) {
+      double target = 70.0;
+      double current = NavX.getAngle();
+      double kP = 2.0;
+
+      mecanumDrive.driveCartesian(0.0, 0.0, ((target - current) * kP) / 300);
+
+    } else {
       mecanumDrive.driveCartesian(xSpeed * 0.8, ySpeed * 0.8, (zRotation * 0.8) / 2);
     }
   }
@@ -146,6 +158,7 @@ public class DriveSystem extends SubsystemBase {
 
   public void setPIDLooped() {
     isPID = !isPID;
+
     SmartDashboard.putBoolean("Is PID", isPID);
   }
 
@@ -200,18 +213,23 @@ public class DriveSystem extends SubsystemBase {
     mecanumDrive.driveCartesian(0.0, 0.0, ((Error * kP) + (accumError * kI)) / 300);
   }
 
+  // PID Loop for driving the robot while also targeting with limelgiht
   public void driveWithTargeting(double x, double y, double Error) {
     accumError += Error;
     double kI = 1.0e-3;
     double kP = 4.0;
     mecanumDrive.driveCartesian(x / 2, y / 2, ((Error * kP) + (accumError * kI)) / 300);
+
   }
 
+  // Toggle for limelight targeting
   public void toggleTargeting() {
     isTargeting = !isTargeting;
     SmartDashboard.putBoolean("Is Targeting", isTargeting);
   }
 
+
+  // Set off toggle for robot start so targeting is always off unless turned on
   public void targetOff() {
     isTargeting = false;
     SmartDashboard.putBoolean("Is Targeting", isTargeting);
@@ -243,7 +261,6 @@ public class DriveSystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Accumulated Error", accumError);
     mecanumDrive.feed();
     // This method will be called once per scheduler run
   }
@@ -252,3 +269,4 @@ public class DriveSystem extends SubsystemBase {
     setDefaultCommand(new DriveWithJoystick());
   }
 }
+

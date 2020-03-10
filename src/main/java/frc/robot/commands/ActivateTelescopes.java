@@ -20,7 +20,7 @@ public class ActivateTelescopes extends CommandBase {
 
   private final ClimbSubsystem cs;
 
-  private double speed = -0.6;
+  private double speed = -0.9;
 
   public ActivateTelescopes() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -36,7 +36,10 @@ public class ActivateTelescopes extends CommandBase {
   @Override
   public void execute() {
       cs.setActivated(true);
-      cs.spinTeleMotor(speed);
+      if(cs.isReverse())
+        cs.reverseTeleMotor(0.4);
+      else
+        cs.spinTeleMotor(speed);
     }
 
   // Called once the command ends or is interrupted.

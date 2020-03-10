@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Factory;
 import frc.robot.subsystems.DriveSystem;
+import frc.robot.subsystems.IntakeAndOutake;
 
 public class DriveToDistance extends CommandBase {
   /**
@@ -11,7 +12,12 @@ public class DriveToDistance extends CommandBase {
    * https://www.chiefdelphi.com/t/neo-motor-integrated-encoder-w-spark-max-controller/340458
    */
 
+
   private final DriveSystem driveSystem;
+
+  private static IntakeAndOutake inAndOut = null;
+
+
 
   private double goal;
 

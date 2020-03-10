@@ -8,9 +8,18 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.Autonomous;
+
+import frc.robot.commands.ActivateTelescopes;
+import frc.robot.commands.AutonomousCommands.AutonomousLine;
+import frc.robot.commands.AutonomousCommands.AutonomousShoot;
+import frc.robot.commands.AutonomousCommands.AutonomousTrench;
+import frc.robot.commands.AutonomousCommands.AutonomousTrench5Ball;
+import frc.robot.commands.AutonomousCommands.AutonomousTrench6Ball;
+import frc.robot.commands.AutonomousCommands.BeyBlade;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.commands.DriveWithTargeting;
 import frc.robot.subsystems.DriveSystem;
@@ -34,6 +43,9 @@ public class Robot extends TimedRobot {
   private Command driveWithTargeting;
   private LimelightSubsystem lime;
 
+  private SendableChooser<Command> autoChoose;
+
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -41,13 +53,27 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    
+    
     driveSystem = Factory.getDrive();
     lime = Factory.getLimelight();
     intakeAndOutake = Factory.getIntakeOutake();
+
     driveWithJoy = new DriveWithJoystick();
-    autoDrive = new Autonomous();
+    autoDrive = new AutonomousShoot();
     driveWithTargeting = new DriveWithTargeting();
 
+    autoChoose = new SendableChooser<>();
+    autoChoose.setDefaultOption("Turn and Shoot", new AutonomousShoot());
+    autoChoose.addOption("Trench FIVE Ball", new AutonomousTrench5Ball());
+    autoChoose.addOption("Trench SIX Ball", new AutonomousTrench6Ball());
+    autoChoose.addOption("Drive Off Line", new AutonomousLine());
+    autoChoose.addOption("Let It Rip", new BeyBlade());
+    
+
+    SmartDashboard.putData("Auto Chooser", autoChoose);
+    
+    // Commands
 
   }
 
@@ -89,6 +115,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    lime.visionOff();
+    autoDrive = autoChoose.getSelected();
     driveSystem.zeroGyro();
     autoDrive.schedule();
 
@@ -120,7 +148,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+
     intakeAndOutake.getSensors();
+
+    //intakeAndOutake.getSensors();
+
     if (driveSystem.getTarget()){
       driveWithJoy.cancel();
       driveWithTargeting.schedule();

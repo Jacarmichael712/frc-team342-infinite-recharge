@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class LimelightSubsystem extends SubsystemBase {
   private NetworkTable table;
   private NetworkTableEntry tv, ty, tx, camMode, ledMode;
   private double yOffsetAngle, xOffsetAngle;
   private int cameraMode, lightMode, validTarget;
+  private double limeError = 2.5;
 
   /**
    * Creates a new LimelightSubsystem.
@@ -41,7 +41,7 @@ public class LimelightSubsystem extends SubsystemBase {
     cameraMode = camMode.getNumber(0).intValue();
     lightMode = ledMode.getNumber(0).intValue();
 
-    SmartDashboard.putNumber("Limelight Distance", getDistance());
+    //SmartDashboard.putNumber("Limelight Distance", getDistance());
   }
 
   /*
@@ -49,7 +49,7 @@ public class LimelightSubsystem extends SubsystemBase {
    * 
    */
   public double getDistance() {
-    return (98.25 - 21.125) / Math.tan((yOffsetAngle + 15.0) * Math.PI / 180);
+    return (90.0 - 21.125) / Math.tan((yOffsetAngle + 15.0) * Math.PI / 180);
   }
 
   /*
@@ -92,7 +92,7 @@ public class LimelightSubsystem extends SubsystemBase {
    * 
    */
   public double getXOffsetAngle() {
-    return xOffsetAngle;
+      return xOffsetAngle + limeError;
   }
 
   /*
@@ -106,4 +106,6 @@ public class LimelightSubsystem extends SubsystemBase {
   public boolean getValidTarget() {
     return (validTarget == 1) ? true : false;
   }
+
 }
+
